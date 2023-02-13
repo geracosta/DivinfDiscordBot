@@ -98,6 +98,7 @@ authorize().then((valor) => {
         filas.forEach((fila) => {
      // Print columns A and C, D, J which correspond to indices 0 and 2, 3, 10.
             console.log(`${fila[0]} - ${fila[2]}`);
+            // meterlo en el json
         });
     })
 }).catch(console.error);
