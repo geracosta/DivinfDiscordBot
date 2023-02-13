@@ -2,7 +2,7 @@
 const { Client, GatewayIntentBits } = require('discord.js');
 const { bot_token, discord_intents } = require('./config.json');
 
-// 
+// imports
 const fs = require('fs').promises;
 const path = require('path');
 const process = require('process');
