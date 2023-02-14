@@ -1,6 +1,6 @@
 // Discord imports
 const { Client, GatewayIntentBits, ApplicationCommand, Events } = require('discord.js');
-const { bot_token, discord_intents } = require('./config.json');
+const { bot_token, discord_intents, spreadsheets } = require('./config.json');
 
 // imports
 const fs = require('fs').promises;
@@ -80,7 +80,7 @@ async function authorize() {
 async function listMajors(auth) {
   const sheets = google.sheets({version: 'v4', auth});
   const res = await sheets.spreadsheets.values.get({
-    spreadsheetId: '1U9QxtzU3qIZiARgUE8D2gqPSgKOIWWUPAj0n99cKFkQ',
+    spreadsheetId: spreadsheets,
     range: 'servidores!A2:R',
   });
   const rows = res.data.values;
