@@ -1,5 +1,5 @@
 // Discord imports
-const { Client, GatewayIntentBits } = require('discord.js');
+const { Client, GatewayIntentBits, ApplicationCommand, Events } = require('discord.js');
 const { bot_token, discord_intents } = require('./config.json');
 
 // imports
@@ -95,95 +95,53 @@ async function listMajors(auth) {
 
 authorize().then((valor) => {
     listMajors(valor).then((filas) => {
-        filas.forEach((fila) => {
+      const ALL_INTENTS = 32767
+      const client = new Client({
+        intents: discord_intents
+      });
+
+      let commands = [];
+      
+      const filasFiltradas = filas.filter(fila => fila[0] === "creditodirecto" || fila[0] === "cuotitas" || fila[0] === "santander");
+
+      filasFiltradas.forEach((fila) => {
      // Print columns A and C, D, J which correspond to indices 0 and 2, 3, 10.
-            console.log(`${fila[0]} - ${fila[2]}`);
+            // Este comment funciona bien console.log(`{ name: ${fila[0]}-${fila[2]}-${fila[3]}, description: ${fila[0]} ${fila[2]} ${fila[3]} }`);
             // meterlo en el json
+              if (fila[3].includes('db')) {
+                commands.push(new ApplicationCommand(client,{name:`${fila[0]}-${fila[2].replace('/','-').slice(0,3)}-${fila[3].replace('/','-').slice(0,5)}-db`,description:`${fila[0]} ${fila[2]} ${fila[3]}`}));
+              }else {
+                commands.push(new ApplicationCommand(client,{name:`${fila[0]}-${fila[2].replace('/','-').slice(0,3)}-${fila[3].replace('/','-').slice(0,5)}`,description:`${fila[0]} ${fila[2]} ${fila[3]}`}));
+              }
         });
-    })
-}).catch(console.error);
+        client.on('ready', ()=>{
+          client.application.commands.set(commands);
+          console.log('Funca!')
+      })
 
+      const comandos = {};
 
-const ALL_INTENTS = 32767
+      filasFiltradas.forEach((fila) => {
+        const comando = `${fila[0]}-${fila[2].replace('/','-').slice(0,3)}-${fila[3].replace('/','-').slice(0,5)}`;
+        comandos[comando] = fila[9];
+        comandos[`${comando}-db`] = fila[9];
+      });
 
-const client = new Client({
-	intents: discord_intents
-});
+      client.on(Events.InteractionCreate, async interaction => {
+        if (!interaction.isCommand() || !interaction.inGuild() || !interaction.member) return;
+        const comando = comandos[interaction.commandName];
+        if (!comando) return;
 
-client.on('ready', ()=>{
-    console.log('Funca!')
-    client.application.commands.set([
-        {
-            name: 'directo-test',
-            description: 'Directo Test',
-            options: [],
-        },
-        {
-            name: 'directo-homologacion',
-            description: 'Directo Homologacion',
-            options: [],
-        },
-        {
-            name: 'directo-produccion',
-            description: 'Directo Produccion',
-            options: [],
-        },
-        {
-            name: 'cuotitas-test',
-            description: 'Cuotitas Test',
-            options: [],
-        },
-        {
-            name: 'cuotitas-produccion',
-            description: 'Cuotitas Produccion',
-            options: [],
-        },
-        {
-            name: 'cuotitas-homologacion',
-            description: 'Cuotitas Homologacion',
-            options: [],
-        },
-		{
-            name: 'comandos',
-            description: 'comandos',
-            options: [],
-        },
-		{
-            name: 'reset',
-            description: 'reset',
-            options: [],
+        try {
+          console.log(comando);
+          await interaction.reply({content: comando, ephemeral: false});
+        } catch (error) {
+          console.error(error);
+          await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
         }
-    ]);
-})
+      });
 
-client.on('interactionCreate', (int) =>{
-    if(int.isCommand() && int.commandName === 'directo-test'){
-        int.reply('http://comercios-test.directo.com.ar/LOANTEST/index.aspx')
-    }
-    if(int.isCommand() && int.commandName === 'directo-homologacion'){
-        int.reply('http://comercios-test.directo.com.ar/LOAN/index.aspx')
-    }
-    if(int.isCommand() && int.commandName === 'directo-produccion'){
-        int.reply('http://micomercio.directo.com.ar')
-    }
-    if(int.isCommand() && int.commandName === 'cuotitas-test'){
-        int.reply('http://190.210.216.50/Test/Cuotitas/Login.aspx')
-    }
-    if(int.isCommand() && int.commandName === 'cuotitas-produccion'){
-        int.reply('http://www.prestamoscuotitas.com.ar/')
-    }
-    if(int.isCommand() && int.commandName === 'cuotitas-homologacion'){
-        int.reply('http://www.prestamoscuotitas.com.ar/')
-    }
-	if(int.isCommand() && int.commandName === 'comandos'){
-        int.reply('`*cuotitas*\n/cuotitas-produccion\n/cuotitas-test\n/cuotitas-homologacion\n\n*directo*\n/directo-produccion\n/directo-test\n/directo-homologacion`\n\n');
-    }
-	if(int.isCommand() && int.commandName === 'reset'){
-		client.destroy();
-		client.login(bot_token);
-		int.reply('bot reseteado correctamente');
-    }
- })
-
- client.destroy();
- client.login(bot_token);
+      client.destroy();
+      client.login(bot_token);
+    })
+}).catch("shit :", console.error);
