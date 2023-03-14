@@ -106,8 +106,7 @@ authorize().then((valor) => {
 
       filasFiltradas.forEach((fila) => {
      // Print columns A and C, D, J which correspond to indices 0 and 2, 3, 10.
-            // Este comment funciona bien console.log(`{ name: ${fila[0]}-${fila[2]}-${fila[3]}, description: ${fila[0]} ${fila[2]} ${fila[3]} }`);
-            // meterlo en el json
+            // Este comment funciona bien console.log(`{ name: ${fila[0]}-${fila[2]}-${fila[3]}, description: ${fila[0]} ${fila[2]} ${fila[3]} }`)
               if (fila[3].includes('db')) {
                 commands.push(new ApplicationCommand(client,{name:`${fila[0]}-${fila[2].replace('/','-').slice(0,3)}-${fila[3].replace('/','-').slice(0,5)}-db`,description:`${fila[0]} ${fila[2]} ${fila[3]}`}));
               }else {
