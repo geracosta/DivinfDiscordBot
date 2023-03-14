@@ -105,8 +105,7 @@ authorize().then((valor) => {
       const filasFiltradas = filas.filter(fila => fila[0] === "creditodirecto" || fila[0] === "cuotitas" || fila[0] === "santander");
 
       filasFiltradas.forEach((fila) => {
-     // Print columns A and C, D, J which correspond to indices 0 and 2, 3, 10.
-            // Este comment funciona bien console.log(`{ name: ${fila[0]}-${fila[2]}-${fila[3]}, description: ${fila[0]} ${fila[2]} ${fila[3]} }`)
+     // Print columns A and C, D, J which correspond to indexes 0 and 2, 3, 9.
               if (fila[3].includes('db')) {
                 commands.push(new ApplicationCommand(client,{name:`${fila[0]}-${fila[2].replace('/','-').slice(0,3)}-${fila[3].replace('/','-').slice(0,5)}-db`,description:`${fila[0]} ${fila[2]} ${fila[3]}`}));
               }else {
